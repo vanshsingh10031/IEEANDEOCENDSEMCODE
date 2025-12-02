@@ -1,34 +1,30 @@
-from django.http import HttpResponse, JsonResponse
-from .data import get_all_slots, get_free_slots
-import json
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+import json
+from .data import get_all_slots, get_free_slots, update_slot_status, get_last_log
+from django.shortcuts import render
 
-
-def home(request):
-    return HttpResponse("Hello, Django! 🚀")
+def dashboard(request):
+    return render(request, "dashboard.html")
 
 def all_slots_status(request):
-    slots = get_all_slots()
-    data = {
-        "slots": slots
-    }
-    return JsonResponse(data)
+    return JsonResponse({
+        "slots": get_all_slots(),
+        "debug_log": get_last_log(),
+    })
+
 
 
 def free_slots(request):
     free = get_free_slots()
-    data = {
+    return JsonResponse({
         "count": len(free),
-        "free_slots": [
-            {"id": slot["id"], "label": slot["label"]}
-            for slot in free
-        ],
-    }
-    return JsonResponse(data)
+        "free_slots": [{"id": s["id"], "label": s["label"]} for s in free],
+    })
 
 
 @csrf_exempt
-def blink_slot(request):
+def update_slot(request):
     if request.method != "POST":
         return JsonResponse({"error": "POST request required"}, status=400)
 
@@ -38,11 +34,18 @@ def blink_slot(request):
         return JsonResponse({"error": "Invalid JSON"}, status=400)
 
     slot_id = data.get("id")
+    status = data.get("is_occupied")
+    distance = data.get("distance")
+    log = data.get("log")
 
-    if not slot_id:
-        return JsonResponse({"error": "id required"}, status=400)
+    if slot_id is None or status is None:
+        return JsonResponse({"error": "id and is_occupied required"}, status=400)
 
-    print(f"🚗 Blink request received for slot: {slot_id}")  # Debug log for testing
+    updated = update_slot_status(slot_id, bool(status), distance=distance, log=log)
 
-    # Pseudo action: Pretend we blink the light
-    return JsonResponse({"message": f"Blink triggered for {slot_id}"})
+    if updated:
+        print(f"🔄 Slot {slot_id} updated: is_occupied={status}, distance={distance}")
+        return JsonResponse({"message": "Status updated successfully"})
+    else:
+        return JsonResponse({"error": "Slot not found"}, status=404)
+
