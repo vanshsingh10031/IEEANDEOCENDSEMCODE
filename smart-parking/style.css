@@ -1,0 +1,34 @@
+body.light {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+body.light .slot {
+    background: #e2e8f0 !important;
+}
+
+body.light .free {
+    background: #34d399 !important;
+}
+
+body.light .occupied {
+    background: #f87171 !important;
+}
+
+body.light .navbar {
+    background: #cbd5e1;
+}
+.navbar {
+    background: #1e293b;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+.navbar a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    margin-right: 10px;
+}
