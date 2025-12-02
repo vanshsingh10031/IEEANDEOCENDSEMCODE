@@ -1,0 +1,42 @@
+Documentation 
+pip install django
+
+
+django-admin startproject smartparking
+
+cd smartparking
+
+
+python manage.py runserver
+
+python manage.py startapp main
+
+
+Api Usage : 1. To Check Weather the slot is free or not and display on the Webdasboard 
+            2. To Identify a Car Parking Slot 
+
+| Internal ID | Human Label | Sensor Pin | LED Pin |
+| ----------- | ----------- | ---------- | ------- |
+| **S1**      | **A1**      | D2         | D5      |
+| **S2**      | **A2**      | D3         | D6      |
+| **S3**      | **A3**      | D4         | D7      |
+
+
+| Benefit                           | Explanation                                        |
+| --------------------------------- | -------------------------------------------------- |
+| **Simple to show in UI**          | Straight 3 slots in a row: A1, A2, A3              |
+| **Makes sense physically**        | Can label each slot on the cardboard with A1/A2/A3 |
+| **Scalable**                      | If you add B row later, IDs + logic stay same      |
+| **Hardware mapping stays stable** | UI changes don’t affect ESP pin logic              |
+
+[
+  { "id": "S1", "label": "A1", "status": "FREE" },
+  { "id": "S2", "label": "A2", "status": "OCCUPIED" },
+  { "id": "S3", "label": "A3", "status": "FREE" }
+]
+
+
+
+  <connectionStrings>
+    <add name="PublicEventManagementEntities" providerName="System.Data.EntityClient" connectionString="metadata=res://*/Models.EF.Model1.csdl|                                   res://*/Models.EF.Model1.ssdl|                                   res://*/Models.EF.Model1.msl;                          provider=System.Data.SqlClient;                          provider connection string=&quot;                            Data Source=localhost;                            Initial Catalog=PublicEventManagement_abhinandan_SSY;                            Integrated Security=True;                            MultipleActiveResultSets=True;                            Encrypt=False;                            TrustServerCertificate=True;                            App=EntityFramework&quot;" />
+  </connectionStrings>

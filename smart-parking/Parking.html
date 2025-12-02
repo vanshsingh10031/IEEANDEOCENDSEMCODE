@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Parking Dashboard</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+
+        body {
+            background: #0f172a;
+            color: white;
+            display: flex;
+            justify-content: center;
+            padding: 30px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .sub {
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+
+        .summary {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .summary .box {
+            background: #1e293b;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 20px;
+        }
+
+        .slots {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .slot {
+            background: #1e293b;
+            padding: 40px 0;
+            border-radius: 12px;
+            font-size: 22px;
+            transition: 0.3s;
+        }
+
+        .free {
+            background: #10b981 !important;
+        }
+
+        .occupied {
+            background: #ef4444 !important;
+        }
+    </style>
+
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Smart Parking System</h1>
+    <p class="sub">Real-Time Slot Monitoring</p>
+
+    <div class="summary">
+        <div class="box" id="freeCount">Free: 0</div>
+        <div class="box" id="occupiedCount">Occupied: 0</div>
+    </div>
+
+    <div class="slots">
+        <div class="slot" id="slot1">Slot 1</div>
+        <div class="slot" id="slot2">Slot 2</div>
+        <div class="slot" id="slot3">Slot 3</div>
+        <div class="slot" id="slot4">Slot 4</div>
+    </div>
+
+</div>
+
+<script>
+    // TEST DATA (Later replace with backend/ESP-01 fetch)
+    function getTestData() {
+        return {
+            slot1: Math.random() > 0.5 ? "free" : "occupied",
+            slot2: Math.random() > 0.5 ? "free" : "occupied",
+            slot3: Math.random() > 0.5 ? "free" : "occupied",
+            slot4: Math.random() > 0.5 ? "free" : "occupied"
+        };
+    }
+
+    function updateUI(data) {
+        let freeCount = 0;
+        let occupiedCount = 0;
+
+        for (let i = 1; i <= 4; i++) {
+            let slot = document.getElementById("slot" + i);
+            let status = data["slot" + i];
+
+            slot.classList.remove("free", "occupied");
+
+            if (status === "free") {
+                slot.classList.add("free");
+                slot.innerHTML = `Slot ${i}<br>FREE`;
+                freeCount++;
+            } else {
+                slot.classList.add("occupied");
+                slot.innerHTML = `Slot ${i}<br>OCCUPIED`;
+                occupiedCount++;
+            }
+        }
+
+        document.getElementById("freeCount").innerText = "Free: " + freeCount;
+        document.getElementById("occupiedCount").innerText = "Occupied: " + occupiedCount;
+    }
+
+    // AUTO REFRESH EVERY 2 SECONDS
+    setInterval(() => {
+        let data = getTestData(); // Replace this with API call
+        updateUI(data);
+    }, 2000);
+</script>
+
+</body>
+</html>
