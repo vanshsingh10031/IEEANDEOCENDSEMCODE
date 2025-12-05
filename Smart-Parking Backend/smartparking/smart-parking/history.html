@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Parking History</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>Parking Logs</h1>
+
+<table id="logTable">
+    <tr>
+        <th>Time</th>
+        <th>Slot</th>
+        <th>Status</th>
+    </tr>
+</table>
+
+<script>
+function addLog(slot, status) {
+    let table = document.getElementById("logTable");
+    let row = table.insertRow();
+    row.insertCell(0).innerHTML = new Date().toLocaleString();
+    row.insertCell(1).innerHTML = slot;
+    row.insertCell(2).innerHTML = status;
+}
+</script>
+
+</body>
+</html>

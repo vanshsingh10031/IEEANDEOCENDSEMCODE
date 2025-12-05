@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Smart Parking Dashboard</title>
+
+<!-- Super important for mobile scaling -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+    :root {
+        --bg: #f4f5f7;
+        --card-bg: #ffffff;
+        --text-main: #1a1a1a;
+        --text-sub: #707070;
+        --green-bg: #d7fddf;
+        --green-text: #0b8f41;
+        --red-bg: #ffe0e0;
+        --red-text: #c52222;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+        background: var(--bg);
+        color: var(--text-main);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+    }
+
+    .app {
+        width: 100%;
+        max-width: 430px;          /* nice mobile width, looks like a phone */
+        min-height: 100vh;
+        background: var(--bg);
+        padding: 18px 16px 28px;
+    }
+
+    /* header */
+    .header {
+        margin-bottom: 18px;
+    }
+
+    .title {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .subtitle {
+        font-size: 13px;
+        color: var(--text-sub);
+    }
+
+    /* summary row */
+    .summary-row {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .summary-card {
+        flex: 1;
+        background: var(--card-bg);
+        border-radius: 18px;
+        padding: 12px;
+        text-align: center;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    }
+
+    .summary-card h3 {
+        font-size: 22px;
+        margin-bottom: 2px;
+    }
+
+    .summary-card p {
+        font-size: 12px;
+        color: var(--text-sub);
+    }
+
+    /* slot list */
+    .slot-list-title {
+        font-size: 14px;
+        margin: 8px 2px 10px;
+        color: var(--text-sub);
+    }
+
+    .slot-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .slot-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--card-bg);
+        border-radius: 18px;
+        padding: 14px 14px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    }
+
+    .slot-left {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    .slot-name {
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+    .slot-sub {
+        font-size: 11px;
+        color: var(--text-sub);
+    }
+
+    .badge {
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .badge.free {
+        background: var(--green-bg);
+        color: var(--green-text);
+    }
+
+    .badge.occupied {
+        background: var(--red-bg);
+        color: var(--red-text);
+    }
+
+    .car {
+        width: 70px;
+        height: 34px;
+        border-radius: 999px;
+        background: #b0ff44;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        transform: translateX(12px);
+        transition: 0.3s ease;
+        opacity: 0.3;
+    }
+
+    .car::before {
+        content: "";
+        position: absolute;
+        inset: 4px 8px;
+        border-radius: 999px;
+        background: #111827;
+    }
+
+    .car::after {
+        content: "";
+        position: absolute;
+        inset: 8px 16px;
+        border-radius: 999px;
+        background: #b0ff44;
+    }
+
+    .slot-card.occupied .car {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    /* bottom bar (optional) */
+    .bottom-bar {
+        position: fixed;
+        bottom: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 430px;
+        display: flex;
+        justify-content: center;
+        pointer-events: none;
+    }
+
+    .bottom-pill {
+        pointer-events: all;
+        background: #111827;
+        color: white;
+        border-radius: 999px;
+        padding: 10px 18px;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    }
+
+    .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: #22c55e;
+    }
+
+    @media (max-width: 360px) {
+        .summary-card h3 { font-size: 19px; }
+        .slot-name { font-size: 14px; }
+        .car { width: 60px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="title">Smart Parking</div>
+        <div class="subtitle">Live availability • Zone A</div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="summary-row">
+        <div class="summary-card">
+            <h3 id="freeCount">0</h3>
+            <p>Free slots</p>
+        </div>
+        <div class="summary-card">
+            <h3 id="occupiedCount">0</h3>
+            <p>Occupied</p>
+        </div>
+    </div>
+
+    <!-- SLOTS -->
+    <div class="slot-list-title">Slots in this zone</div>
+
+    <div class="slot-list">
+        <div class="slot-card" id="slot1">
+            <div class="slot-left">
+                <div class="slot-name">Slot 1</div>
+                <div class="slot-sub">Near entrance</div>
+                <div class="badge free">FREE</div>
+            </div>
+            <div class="car"></div>
+        </div>
+
+        <div class="slot-card" id="slot2">
+            <div class="slot-left">
+                <div class="slot-name">Slot 2</div>
+                <div class="slot-sub">Covered</div>
+                <div class="badge free">FREE</div>
+            </div>
+            <div class="car"></div>
+        </div>
+
+        <div class="slot-card" id="slot3">
+            <div class="slot-left">
+                <div class="slot-name">Slot 3</div>
+                <div class="slot-sub">Standard</div>
+                <div class="badge free">FREE</div>
+            </div>
+            <div class="car"></div>
+        </div>
+
+        <div class="slot-card" id="slot4">
+            <div class="slot-left">
+                <div class="slot-name">Slot 4</div>
+                <div class="slot-sub">Standard</div>
+                <div class="badge free">FREE</div>
+            </div>
+            <div class="car"></div>
+        </div>
+    </div>
+</div>
+
+<!-- bottom status pill -->
+<div class="bottom-bar">
+    <div class="bottom-pill">
+        <span class="dot"></span>
+        <span id="statusText">Last update: just now</span>
+    </div>
+</div>
+
+<script>
+    // fake test data generator – replace with real API later
+    function getTestData() {
+        return {
+            slot1: Math.random() > 0.5 ? "free" : "occupied",
+            slot2: Math.random() > 0.5 ? "free" : "occupied",
+            slot3: Math.random() > 0.5 ? "free" : "occupied",
+            slot4: Math.random() > 0.5 ? "free" : "occupied"
+        };
+    }
+
+    function updateUI(data) {
+        let free = 0, occ = 0;
+
+        for (let i = 1; i <= 4; i++) {
+            const card = document.getElementById("slot" + i);
+            const badge = card.querySelector(".badge");
+            const status = data["slot" + i];
+
+            card.classList.remove("occupied");
+            badge.classList.remove("free", "occupied");
+
+            if (status === "free") {
+                badge.textContent = "FREE";
+                badge.classList.add("free");
+                free++;
+            } else {
+                badge.textContent = "OCCUPIED";
+                badge.classList.add("occupied");
+                card.classList.add("occupied");
+                occ++;
+            }
+        }
+
+        document.getElementById("freeCount").textContent = free;
+        document.getElementById("occupiedCount").textContent = occ;
+        document.getElementById("statusText").textContent =
+            "Last update: " + new Date().toLocaleTimeString();
+    }
+
+    // auto-refresh for demo
+    setInterval(() => {
+        const data = getTestData();   // later: replace with fetch(...) from your API
+        updateUI(data);
+    }, 2000);
+
+    // initial load
+    updateUI(getTestData());
+</script>
+
+</body>
+</html>
